@@ -6,17 +6,7 @@ import { Card } from "../components/ui/Card";
 import { Badge } from "../components/ui/Badge";
 import { useAppStore } from "../store/useAppStore";
 import { personalities } from "../data/personalities";
-
-const personalityEmoji: Record<string, string> = {
-  dramatic: "🎭",
-  snarky: "😏",
-  cute: "🌸",
-  honest: "🎯",
-  villain: "😈",
-  advisor: "🧘",
-  chaotic: "🌀",
-  professional: "💼",
-};
+import { personalityEmoji } from "../data/personalityMeta";
 
 export function SettingsPage() {
   const { preferences, updatePreferences, roulettes, history, clearHistory } =

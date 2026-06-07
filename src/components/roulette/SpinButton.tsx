@@ -8,12 +8,21 @@ interface SpinButtonProps {
 }
 
 export function SpinButton({ isSpinning, onClick, disabled = false }: SpinButtonProps) {
+  const isIdle = !isSpinning && !disabled;
+
   return (
     <motion.button
       onClick={onClick}
       disabled={disabled || isSpinning}
-      whileTap={!isSpinning ? { scale: 0.93 } : undefined}
-      whileHover={!isSpinning ? { scale: 1.04 } : undefined}
+      whileTap={isIdle ? { scale: 0.93 } : undefined}
+      whileHover={isIdle ? { scale: 1.04 } : undefined}
+      // Subtle breathing pulse when idle — draws attention to the main CTA
+      animate={isIdle ? { scale: [1, 1.03, 1] } : { scale: 1 }}
+      transition={
+        isIdle
+          ? { repeat: Infinity, duration: 2.4, ease: "easeInOut", repeatDelay: 1.8 }
+          : { duration: 0.15 }
+      }
       className="relative overflow-hidden rounded-2xl cursor-pointer disabled:cursor-not-allowed"
       style={{
         background: isSpinning

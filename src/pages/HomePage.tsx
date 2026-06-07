@@ -9,6 +9,7 @@ import { useAppStore } from "../store/useAppStore";
 import { hasCompletedDailyDestiny } from "../utils/date";
 import { personalities } from "../data/personalities";
 import { templates } from "../data/templates";
+import { personalityEmoji } from "../data/personalityMeta";
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
@@ -16,11 +17,6 @@ const categoryEmoji: Record<string, string> = {
   daily: "☀️", couple: "💑", work: "💼", friends: "🎉",
   selfcare: "🌸", food: "🍕", entertainment: "🎬",
   chores: "🧹", challenges: "⚡", random: "🎲",
-};
-
-const personalityEmoji: Record<string, string> = {
-  dramatic: "🎭", snarky: "😏", cute: "🌸", honest: "🎯",
-  villain: "😈", advisor: "🧘", chaotic: "🌀", professional: "💼",
 };
 
 const gameModeLabel: Record<string, string> = {

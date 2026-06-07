@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
-import { CheckCircle, RefreshCw, Sparkles, ChevronRight } from "lucide-react";
+import { CheckCircle, RefreshCw } from "lucide-react";
 import type { SpinResult } from "../../types";
 
 interface SpinResultCardProps {
   result: SpinResult;
   onAccept: () => void;
-  /** When provided, shows a "Girar de novo" / secondary action button. */
+  /** When provided, shows a "Girar de novo" secondary action button. */
   onSpinAgain?: () => void;
   /**
    * "overlay" (default) — slides up from the bottom, covers the wheel.
@@ -24,6 +24,15 @@ interface SpinResultCardProps {
   spinAgainLabel?: string;
 }
 
+// Derive a 1–2 char initial from an option label for the medallion
+function getInitial(label: string): string {
+  const words = label.trim().split(/\s+/);
+  if (words.length >= 2) {
+    return (words[0][0] + words[1][0]).toUpperCase();
+  }
+  return label.slice(0, 2).toUpperCase();
+}
+
 export function SpinResultCard({
   result,
   onAccept,
@@ -37,6 +46,7 @@ export function SpinResultCard({
 }: SpinResultCardProps) {
   const color = result.selectedOption.color ?? "#E07B54";
   const isOverlay = variant === "overlay";
+  const initial = getInitial(result.selectedOption.label);
 
   const headerLabel = title ?? (isFinalResult ? "Vencedor escolhido" : "O destino escolheu");
 
@@ -59,62 +69,84 @@ export function SpinResultCard({
         border: isOverlay ? undefined : "1px solid #E7DCCF",
       }}
     >
-      {/* Color accent bar */}
+      {/* ── Tinted header band ──────────────────────────────────────────────── */}
       <div
-        className="h-1.5 w-full"
-        style={{ background: `linear-gradient(90deg, ${color}, ${color}88)` }}
-      />
-
-      <div className={isOverlay ? "px-6 pt-5 pb-8" : "px-5 pt-4 pb-5"}>
+        className="px-5 pt-5 pb-4"
+        style={{ background: `${color}12` }}
+      >
         {/* Round label */}
         {roundLabel && (
           <motion.p
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="text-[10px] font-bold uppercase tracking-widest text-[#A89880] mb-1"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-[10px] font-bold uppercase tracking-widest mb-2"
+            style={{ color: `${color}BB` }}
           >
             {roundLabel}
           </motion.p>
         )}
 
-        {/* Header */}
-        <div className="flex items-center gap-1.5 mb-4">
-          {isFinalResult
-            ? <span className="text-sm">🏆</span>
-            : <Sparkles size={14} className="text-[#F4C430]" />
-          }
-          <p className="text-xs font-semibold uppercase tracking-wider text-[#A89880]">
-            {headerLabel}
-          </p>
-        </div>
-
-        {/* Main result */}
-        <motion.div
-          initial={{ scale: 0.85, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.15, type: "spring", stiffness: 260, damping: 20 }}
-          className="flex items-center gap-4 mb-4"
-        >
-          <div
-            className="w-12 h-12 rounded-xl shrink-0 flex items-center justify-center text-2xl"
-            style={{ background: `${color}20`, border: `2.5px solid ${color}` }}
+        {/* Header row: medallion + label + subtitle */}
+        <div className="flex items-center gap-4">
+          {/* Colour medallion — replaces generic 🎲 */}
+          <motion.div
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.1, type: "spring", stiffness: 280, damping: 22 }}
+            className="shrink-0 flex items-center justify-center rounded-2xl font-black text-white select-none"
+            style={{
+              width: 52,
+              height: 52,
+              background: isFinalResult
+                ? `linear-gradient(135deg, #F4C430, #E0A800)`
+                : `linear-gradient(135deg, ${color}, ${color}CC)`,
+              boxShadow: `0 4px 16px ${color}44`,
+              fontSize: initial.length === 1 ? 22 : 16,
+              letterSpacing: "-0.02em",
+            }}
           >
-            {isFinalResult ? "🏆" : "🎲"}
-          </div>
-          <div className="min-w-0">
-            <p className="text-xl font-black leading-tight break-words" style={{ color: "#1C1917" }}>
-              {result.selectedOption.label}
-            </p>
-          </div>
-        </motion.div>
+            {isFinalResult ? "🏆" : initial}
+          </motion.div>
 
+          <div className="flex-1 min-w-0">
+            {/* "O destino escolheu" subtitle */}
+            <p
+              className="text-[11px] font-semibold uppercase tracking-wider mb-0.5"
+              style={{ color: `${color}99` }}
+            >
+              {headerLabel}
+            </p>
+
+            {/* Main result — big, bold, coloured */}
+            <motion.p
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, ease: "easeOut" }}
+              className="font-black leading-tight break-words"
+              style={{
+                color: "#1C1917",
+                fontSize: result.selectedOption.label.length > 22 ? "1.1rem" : "1.35rem",
+              }}
+            >
+              {result.selectedOption.label}
+            </motion.p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Body ────────────────────────────────────────────────────────────── */}
+      <div className={isOverlay ? "px-5 pt-3 pb-8" : "px-5 pt-3 pb-5"}>
         {/* Personality phrase */}
         {result.phrase && (
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.28 }}
             className="rounded-xl px-3 py-2.5 mb-4"
-            style={{ background: "#F3EDE4" }}
+            style={{
+              background: "#F3EDE4",
+              borderLeft: `3px solid ${color}55`,
+            }}
           >
             <p className="text-sm italic text-[#6B5E52] leading-relaxed">
               "{result.phrase}"
@@ -127,20 +159,20 @@ export function SpinResultCard({
           <motion.button
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.38 }}
             whileTap={{ scale: 0.97 }}
             onClick={onAccept}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-white text-sm cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-white text-sm cursor-pointer"
             style={{
               background: isFinalResult
-                ? `linear-gradient(135deg, #84A98C, #6B8F72)`
-                : `linear-gradient(135deg, ${color}, ${color}cc)`,
+                ? "linear-gradient(135deg, #84A98C, #6B8F72)"
+                : `linear-gradient(135deg, ${color}, ${color}CC)`,
               boxShadow: isFinalResult
                 ? "0 4px 16px rgba(132,169,140,0.40)"
                 : `0 4px 16px ${color}44`,
             }}
           >
-            {isFinalResult ? <CheckCircle size={16} /> : <ChevronRight size={16} />}
+            {isFinalResult && <CheckCircle size={16} />}
             {acceptLabel}
           </motion.button>
 
@@ -148,13 +180,13 @@ export function SpinResultCard({
             <motion.button
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.48 }}
+              transition={{ delay: 0.46 }}
               whileTap={{ scale: 0.97 }}
               onClick={onSpinAgain}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-[#1C1917] text-sm cursor-pointer"
               style={{ background: "#F3EDE4", border: "1.5px solid #E7DCCF" }}
             >
-              <RefreshCw size={16} />
+              <RefreshCw size={15} />
               {spinAgainLabel}
             </motion.button>
           )}

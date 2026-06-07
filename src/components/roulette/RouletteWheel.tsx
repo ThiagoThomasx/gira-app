@@ -45,6 +45,8 @@ interface RouletteWheelProps {
   rotation: number;
   isSpinning: boolean;
   size?: number;
+  /** Emoji shown at the wheel center. Defaults to "🎯". */
+  personalityEmoji?: string;
 }
 
 const SPIN_DURATION = 3.6; // seconds — must match SpinPage timeout
@@ -54,6 +56,7 @@ export function RouletteWheel({
   rotation,
   isSpinning,
   size = 288,
+  personalityEmoji = "🎯",
 }: RouletteWheelProps) {
   const cx = size / 2;
   const cy = size / 2;
@@ -178,7 +181,7 @@ export function RouletteWheel({
           <circle cx={cx} cy={cy} r={innerR + 5} fill="rgba(28,25,23,0.15)" />
           {/* Center cap */}
           <circle cx={cx} cy={cy} r={innerR} fill="white" />
-          {/* Center emoji */}
+          {/* Center emoji — personality-specific */}
           <text
             x={cx}
             y={cy + 1}
@@ -186,7 +189,7 @@ export function RouletteWheel({
             dominantBaseline="middle"
             fontSize={innerR * 0.9}
           >
-            🎯
+            {personalityEmoji}
           </text>
         </svg>
       </motion.div>

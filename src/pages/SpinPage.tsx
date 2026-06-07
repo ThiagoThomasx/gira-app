@@ -9,6 +9,8 @@ import { VetoPanel } from "../components/roulette/VetoPanel";
 import { BestOfThreePanel } from "../components/roulette/BestOfThreePanel";
 import { EliminationPanel } from "../components/roulette/EliminationPanel";
 import { Badge } from "../components/ui/Badge";
+import { EmptyState } from "../components/ui/EmptyState";
+import { Button } from "../components/ui/Button";
 import { useAppStore } from "../store/useAppStore";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { useSound } from "../hooks/useSound";
@@ -29,6 +31,8 @@ import {
 } from "../utils/gameModes";
 import { personalities } from "../data/personalities";
 import { templates } from "../data/templates";
+import { personalityEmoji } from "../data/personalityMeta";
+import { hapticTap, hapticResult } from "../utils/haptic";
 import {
   getAvailableOptions,
   weightedRandomPick,
@@ -48,11 +52,6 @@ import type {
 
 const SPIN_DURATION_MS = 3600 + 300;
 type SpinPhase = "idle" | "spinning" | "result";
-
-const personalityEmoji: Record<string, string> = {
-  dramatic: "🎭", snarky: "😏", cute: "🌸", honest: "🎯",
-  villain: "😈", advisor: "🧘", chaotic: "🌀", professional: "💼",
-};
 const gameModeLabel: Record<string, string> = {
   classic: "Clássico", best_of_3: "Melhor de 3",
   veto: "Veto", elimination: "Eliminação",
@@ -91,6 +90,10 @@ export function SpinPage({ rouletteId, isDailyDestiny, onCreateNew }: SpinPagePr
 
   const spinTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tickCleanupRef = useRef<(() => void) | null>(null);
+  // Always holds the latest handleSpin closure — used by handleSpinAgain's
+  // setTimeout to avoid capturing a stale closure where spinPhase !== "idle".
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleSpinRef = useRef<() => void>(() => undefined);
 
   const { scheduleTicks, playResult } = useSound();
 
@@ -145,6 +148,12 @@ export function SpinPage({ rouletteId, isDailyDestiny, onCreateNew }: SpinPagePr
     }
   }, [activeRoulette, spinPhase]);
 
+  // Keep handleSpinRef current so handleSpinAgain's setTimeout always
+  // calls the latest closure (after state resets have taken effect).
+  useEffect(() => {
+    handleSpinRef.current = handleSpin;
+  });
+
   // Cleanup on unmount
   useEffect(() => () => {
     if (spinTimerRef.current) clearTimeout(spinTimerRef.current);
@@ -186,6 +195,8 @@ export function SpinPage({ rouletteId, isDailyDestiny, onCreateNew }: SpinPagePr
   function handleSpin() {
     if (!activeRoulette || spinPhase !== "idle" || !canSpin) return;
 
+    hapticTap();
+
     const mode = activeRoulette.gameMode;
     const spinOptions = wheelOptions;
     const picked = weightedRandomPick(spinOptions);
@@ -208,8 +219,9 @@ export function SpinPage({ rouletteId, isDailyDestiny, onCreateNew }: SpinPagePr
     tickCleanupRef.current = scheduleTicks(SPIN_DURATION_MS);
 
     spinTimerRef.current = setTimeout(() => {
-      // Result ding — plays once when result is revealed
+      // Audio + haptic feedback when result is revealed
       playResult();
+      hapticResult();
       if (mode === "classic" || mode === "veto") {
         const result = createSpinResult(activeRoulette, picked, after);
         setCurrentResult(result);
@@ -311,10 +323,27 @@ export function SpinPage({ rouletteId, isDailyDestiny, onCreateNew }: SpinPagePr
     setIsIntermediateResult(false);
     if (mode === "best_of_3") setBo3Session(null);
     if (mode === "elimination") setElimSession(null);
-    setTimeout(handleSpin, 180);
+    // Use ref so the callback always sees the fresh closure where
+    // spinPhase === "idle" (after React has re-rendered with resets).
+    setTimeout(() => handleSpinRef.current(), 180);
   }
 
-  if (!activeRoulette) return null;
+  if (!activeRoulette) {
+    return (
+      <div className="flex flex-col min-h-full items-center justify-center px-6 bg-[#FFF8F0]">
+        <EmptyState
+          icon="🎯"
+          title="Nenhuma roleta selecionada"
+          description="Crie sua primeira roleta e deixe o destino decidir por você."
+          action={
+            <Button variant="primary" size="md" onClick={onCreateNew}>
+              Criar roleta
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
 
   const mode = activeRoulette.gameMode;
   const personality = personalities.find((p) => p.id === activeRoulette.personalityId);
@@ -571,6 +600,7 @@ export function SpinPage({ rouletteId, isDailyDestiny, onCreateNew }: SpinPagePr
                   rotation={rotation}
                   isSpinning={spinPhase === "spinning"}
                   size={wheelSize}
+                  personalityEmoji={personalityEmoji[activeRoulette.personalityId]}
                 />
                 <AnimatePresence>
                   {spinPhase !== "result" && (
@@ -654,6 +684,7 @@ export function SpinPage({ rouletteId, isDailyDestiny, onCreateNew }: SpinPagePr
           rotation={rotation}
           isSpinning={spinPhase === "spinning"}
           size={wheelSize}
+          personalityEmoji={personalityEmoji[activeRoulette.personalityId]}
         />
         <AnimatePresence>
           {spinPhase !== "result" && (

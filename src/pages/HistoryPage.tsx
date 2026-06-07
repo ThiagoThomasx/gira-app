@@ -5,19 +5,9 @@ import { EmptyState } from "../components/ui/EmptyState";
 import { PageHeader } from "../components/layout/PageHeader";
 import { Badge } from "../components/ui/Badge";
 import { useAppStore } from "../store/useAppStore";
+import { personalityEmoji } from "../data/personalityMeta";
 
 // ─── constants ────────────────────────────────────────────────────────────────
-
-const personalityEmoji: Record<string, string> = {
-  dramatic: "🎭",
-  snarky: "😏",
-  cute: "🌸",
-  honest: "🎯",
-  villain: "😈",
-  advisor: "🧘",
-  chaotic: "🌀",
-  professional: "💼",
-};
 
 const gameModeLabel: Record<string, string> = {
   classic: "Clássico",
