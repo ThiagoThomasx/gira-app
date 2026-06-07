@@ -11,8 +11,8 @@ const VALID_CATEGORIES: TemplateCategory[] = [
 ]
 
 describe('templates data', () => {
-  it('contains exactly 10 templates', () => {
-    expect(templates).toHaveLength(10)
+  it('contains exactly 11 templates', () => {
+    expect(templates).toHaveLength(11)
   })
 
   it('each template has at least 2 default options', () => {
@@ -60,5 +60,53 @@ describe('templates data', () => {
   it('template ids are unique', () => {
     const ids = templates.map((t) => t.id)
     expect(new Set(ids).size).toBe(ids.length)
+  })
+})
+
+// ─── "Casal à Distância" template ────────────────────────────────────────────
+
+describe('"Casal à Distância" template', () => {
+  const tmpl = templates.find((t) => t.id === 'long-distance-couple')
+
+  it('exists in the templates list', () => {
+    expect(tmpl).toBeDefined()
+  })
+
+  it('is in the "couple" category', () => {
+    expect(tmpl?.category).toBe('couple')
+  })
+
+  it('has at least 10 options', () => {
+    expect(tmpl?.defaultOptions.length).toBeGreaterThanOrEqual(10)
+  })
+
+  it('uses the "advisor" personality', () => {
+    expect(tmpl?.recommendedPersonality).toBe('advisor')
+  })
+
+  it('uses the "best_of_3" game mode', () => {
+    expect(tmpl?.recommendedGameMode).toBe('best_of_3')
+  })
+
+  it('all options have weight 1', () => {
+    for (const opt of tmpl?.defaultOptions ?? []) {
+      expect(opt.weight).toBe(1)
+    }
+  })
+
+  it('all options have non-empty labels', () => {
+    for (const opt of tmpl?.defaultOptions ?? []) {
+      expect(opt.label.trim()).not.toBe('')
+    }
+  })
+})
+
+// ─── "Noite de Casal" still exists ───────────────────────────────────────────
+
+describe('"Noite de Casal" template', () => {
+  it('still exists alongside the long-distance template', () => {
+    const coupleNight = templates.find((t) => t.id === 'couple-night')
+    expect(coupleNight).toBeDefined()
+    expect(coupleNight?.category).toBe('couple')
   })
 })

@@ -175,4 +175,28 @@ export const templates: RouletteTemplate[] = [
     recommendedPersonality: "villain",
     recommendedGameMode: "classic",
   },
+  {
+    id: "long-distance-couple",
+    name: "Casal à Distância",
+    description:
+      "Ideias leves para casais que estão longe fisicamente, mas querem dividir tempo, presença e pequenos rituais.",
+    tagline: "Perto o suficiente para criar uma noite bonita, mesmo longe.",
+    category: "couple",
+    defaultOptions: [
+      { label: "Assistir um filme juntos em chamada", weight: 1 },
+      { label: "Noite de mistério ou detetive", weight: 1 },
+      { label: "Ler o mesmo capítulo e comentar depois", weight: 1 },
+      { label: "Jantar por chamada de vídeo", weight: 1 },
+      { label: "Escolher fotos antigas e relembrar histórias", weight: 1 },
+      { label: "Fazer uma playlist um para o outro", weight: 1 },
+      { label: "Jogar algo online simples", weight: 1 },
+      { label: "Responder perguntas de casal", weight: 1 },
+      { label: "Planejar o próximo encontro", weight: 1 },
+      { label: "Ver um episódio de série juntos", weight: 1 },
+      { label: "Fazer uma chamada sem fazer nada, só companhia", weight: 1 },
+      { label: "Cada um escolhe uma música e explica o motivo", weight: 1 },
+    ],
+    recommendedPersonality: "advisor",
+    recommendedGameMode: "best_of_3",
+  },
 ];
