@@ -164,7 +164,7 @@ export function EditorPage({
   // ─────────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-svh bg-[#FFF8F0] flex flex-col max-w-md mx-auto">
+    <div className="min-h-svh bg-[#FFF8F0] flex flex-col max-w-md lg:max-w-2xl mx-auto">
 
       {/* ── Fixed header ─────────────────────────────────────────────────── */}
       <div className="sticky top-0 z-20 bg-[#FFF8F0]/95 backdrop-blur-sm border-b border-[#E7DCCF] px-4 py-3 flex items-center gap-3">

@@ -40,7 +40,7 @@ export function HistoryPage() {
           description="Quando você girar uma roleta, o resultado vai aparecer aqui."
         />
       ) : (
-        <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
           {history.map((result) => (
             <Card key={result.id} padding="sm">
               <div className="flex items-center gap-3">

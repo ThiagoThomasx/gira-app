@@ -40,7 +40,7 @@ export function SettingsPage() {
           <p className="text-xs font-semibold text-[#A89880] uppercase tracking-wider mb-2 px-1">
             Personalidade padrão
           </p>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
             {personalities.map((p) => {
               const isSelected = preferences.defaultPersonality === p.id;
               return (

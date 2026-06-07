@@ -8,7 +8,6 @@ interface BottomNavigationProps {
   onChange: (tab: Tab) => void;
 }
 
-// Regular tabs on the sides; "spin" is the hero center button
 const LEFT_TABS = [
   { id: "home" as Tab, label: "Início", Icon: Home },
   { id: "explore" as Tab, label: "Explorar", Icon: LayoutGrid },
@@ -20,10 +19,12 @@ const RIGHT_TABS = [
 
 function NavTab({
   id, label, Icon, active, onChange,
-}: { id: Tab; label: string; Icon: typeof Home; active: boolean; onChange: (t: Tab) => void }) {
+}: {
+  id: Tab; label: string; Icon: typeof Home;
+  active: boolean; onChange: (t: Tab) => void;
+}) {
   return (
     <button
-      key={id}
       onClick={() => onChange(id)}
       className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-colors cursor-pointer flex-1"
     >
@@ -51,18 +52,19 @@ export function BottomNavigation({ active, onChange }: BottomNavigationProps) {
   const isSpinActive = active === "spin";
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#E7DCCF]">
-      <div className="flex items-center justify-around px-2 pt-2 pb-1 max-w-md mx-auto">
-        {/* Left tabs */}
+    /*
+     * No `fixed` positioning — this nav lives at the bottom of the AppLayout
+     * flex column and is therefore naturally contained within the app shell.
+     * `pb-safe` adds env(safe-area-inset-bottom) padding for iPhone home bar.
+     */
+    <nav
+      className="bg-white/95 backdrop-blur-md border-t border-[#E7DCCF] shrink-0"
+      style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+    >
+      <div className="flex items-center justify-around px-2 pt-2 pb-1 max-w-xl mx-auto">
         {LEFT_TABS.map(({ id, label, Icon }) => (
-          <NavTab
-            key={id}
-            id={id}
-            label={label}
-            Icon={Icon}
-            active={active === id}
-            onChange={onChange}
-          />
+          <NavTab key={id} id={id} label={label} Icon={Icon}
+            active={active === id} onChange={onChange} />
         ))}
 
         {/* Center hero spin button */}
@@ -72,8 +74,7 @@ export function BottomNavigation({ active, onChange }: BottomNavigationProps) {
             whileTap={{ scale: 0.92 }}
             className="relative flex items-center justify-center rounded-full cursor-pointer"
             style={{
-              width: 52,
-              height: 52,
+              width: 52, height: 52,
               background: isSpinActive
                 ? "linear-gradient(135deg, #C96A43, #A85535)"
                 : "linear-gradient(135deg, #E07B54, #C96A43)",
@@ -84,11 +85,8 @@ export function BottomNavigation({ active, onChange }: BottomNavigationProps) {
             }}
             aria-label="Girar"
           >
-            {/* Outer ring */}
-            <div
-              className="absolute inset-0 rounded-full"
-              style={{ border: "3px solid white", margin: -3 }}
-            />
+            <div className="absolute inset-0 rounded-full"
+              style={{ border: "3px solid white", margin: -3 }} />
             <span style={{ fontSize: 24 }}>🎯</span>
           </motion.button>
           <span
@@ -99,19 +97,11 @@ export function BottomNavigation({ active, onChange }: BottomNavigationProps) {
           </span>
         </div>
 
-        {/* Right tabs */}
         {RIGHT_TABS.map(({ id, label, Icon }) => (
-          <NavTab
-            key={id}
-            id={id}
-            label={label}
-            Icon={Icon}
-            active={active === id}
-            onChange={onChange}
-          />
+          <NavTab key={id} id={id} label={label} Icon={Icon}
+            active={active === id} onChange={onChange} />
         ))}
       </div>
-      <div className="h-[env(safe-area-inset-bottom,0px)]" />
     </nav>
   );
 }

@@ -6,21 +6,39 @@ interface SpinResultCardProps {
   result: SpinResult;
   onAccept: () => void;
   onSpinAgain: () => void;
+  /**
+   * "overlay" (default) — slides up from the bottom, covers the wheel.
+   * Used on mobile.
+   *
+   * "inline" — normal block element that slides in from the right.
+   * Used on desktop, rendered inside the info panel column.
+   */
+  variant?: "overlay" | "inline";
 }
 
-export function SpinResultCard({ result, onAccept, onSpinAgain }: SpinResultCardProps) {
+export function SpinResultCard({
+  result, onAccept, onSpinAgain, variant = "overlay",
+}: SpinResultCardProps) {
   const color = result.selectedOption.color ?? "#E07B54";
+  const isOverlay = variant === "overlay";
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: "100%" }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: "100%" }}
+      initial={isOverlay ? { opacity: 0, y: "100%" } : { opacity: 0, x: 24 }}
+      animate={isOverlay ? { opacity: 1, y: 0 } : { opacity: 1, x: 0 }}
+      exit={isOverlay ? { opacity: 0, y: "100%" } : { opacity: 0, x: 24 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="absolute inset-x-0 bottom-0 z-30 rounded-t-3xl overflow-hidden"
+      className={
+        isOverlay
+          ? "absolute inset-x-0 bottom-0 z-30 rounded-t-3xl overflow-hidden"
+          : "rounded-2xl overflow-hidden"
+      }
       style={{
         background: "white",
-        boxShadow: "0 -8px 40px rgba(28,25,23,0.18)",
+        boxShadow: isOverlay
+          ? "0 -8px 40px rgba(28,25,23,0.18)"
+          : "0 4px 24px rgba(28,25,23,0.10)",
+        border: isOverlay ? undefined : "1px solid #E7DCCF",
       }}
     >
       {/* Color accent bar */}
@@ -29,9 +47,9 @@ export function SpinResultCard({ result, onAccept, onSpinAgain }: SpinResultCard
         style={{ background: `linear-gradient(90deg, ${color}, ${color}88)` }}
       />
 
-      <div className="px-6 pt-5 pb-8">
+      <div className={isOverlay ? "px-6 pt-5 pb-8" : "px-5 pt-4 pb-5"}>
         {/* Header */}
-        <div className="flex items-center gap-1.5 mb-5">
+        <div className="flex items-center gap-1.5 mb-4">
           <Sparkles size={14} className="text-[#F4C430]" />
           <p className="text-xs font-semibold uppercase tracking-wider text-[#A89880]">
             O destino escolheu
@@ -43,23 +61,16 @@ export function SpinResultCard({ result, onAccept, onSpinAgain }: SpinResultCard
           initial={{ scale: 0.85, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.15, type: "spring", stiffness: 260, damping: 20 }}
-          className="flex items-center gap-4 mb-5"
+          className="flex items-center gap-4 mb-4"
         >
-          {/* Color badge */}
           <div
-            className="w-14 h-14 rounded-2xl shrink-0 flex items-center justify-center text-2xl"
-            style={{
-              background: `${color}20`,
-              border: `2.5px solid ${color}`,
-            }}
+            className="w-12 h-12 rounded-xl shrink-0 flex items-center justify-center text-2xl"
+            style={{ background: `${color}20`, border: `2.5px solid ${color}` }}
           >
             🎲
           </div>
           <div className="min-w-0">
-            <p
-              className="text-2xl font-black leading-tight break-words"
-              style={{ color: "#1C1917" }}
-            >
+            <p className="text-xl font-black leading-tight break-words" style={{ color: "#1C1917" }}>
               {result.selectedOption.label}
             </p>
           </div>
@@ -71,7 +82,7 @@ export function SpinResultCard({ result, onAccept, onSpinAgain }: SpinResultCard
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="rounded-xl px-4 py-3 mb-6"
+            className="rounded-xl px-3 py-2.5 mb-4"
             style={{ background: "#F3EDE4" }}
           >
             <p className="text-sm italic text-[#6B5E52] leading-relaxed">
@@ -81,20 +92,20 @@ export function SpinResultCard({ result, onAccept, onSpinAgain }: SpinResultCard
         )}
 
         {/* Actions */}
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-2">
           <motion.button
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             whileTap={{ scale: 0.97 }}
             onClick={onAccept}
-            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-white text-base cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-white text-sm cursor-pointer"
             style={{
               background: `linear-gradient(135deg, ${color}, ${color}cc)`,
               boxShadow: `0 4px 16px ${color}44`,
             }}
           >
-            <CheckCircle size={18} />
+            <CheckCircle size={16} />
             Aceitar
           </motion.button>
 
@@ -104,11 +115,8 @@ export function SpinResultCard({ result, onAccept, onSpinAgain }: SpinResultCard
             transition={{ delay: 0.48 }}
             whileTap={{ scale: 0.97 }}
             onClick={onSpinAgain}
-            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-[#1C1917] text-base cursor-pointer"
-            style={{
-              background: "#F3EDE4",
-              border: "1.5px solid #E7DCCF",
-            }}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-[#1C1917] text-sm cursor-pointer"
+            style={{ background: "#F3EDE4", border: "1.5px solid #E7DCCF" }}
           >
             <RefreshCw size={16} />
             Girar de novo
