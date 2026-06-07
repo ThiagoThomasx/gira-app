@@ -21,6 +21,17 @@ function arcPath(
   startAngle: number,
   endAngle: number
 ): string {
+  // SVG cannot represent a full 360° arc in a single command.
+  // When a segment spans the full circle (1-option wheel), draw two semicircles.
+  if (endAngle - startAngle >= 360) {
+    const top = polar(cx, cy, r, startAngle);
+    const bot = polar(cx, cy, r, startAngle + 180);
+    return (
+      `M ${cx} ${cy} L ${top.x} ${top.y} ` +
+      `A ${r} ${r} 0 1 1 ${bot.x} ${bot.y} ` +
+      `A ${r} ${r} 0 1 1 ${top.x} ${top.y} Z`
+    );
+  }
   const s = polar(cx, cy, r, startAngle);
   const e = polar(cx, cy, r, endAngle);
   const large = endAngle - startAngle > 180 ? 1 : 0;

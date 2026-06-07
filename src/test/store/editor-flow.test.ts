@@ -159,6 +159,78 @@ describe("delete roulette from editor", () => {
   });
 });
 
+// ─── game mode selection ──────────────────────────────────────────────────────
+
+describe("create roulette with each game mode", () => {
+  const twoOptions = (): RouletteOption[] => [
+    baseOption(),
+    { ...baseOption(), id: "o2", label: "B" },
+  ];
+
+  it("stores classic mode correctly", () => {
+    const r = useAppStore.getState().createRoulette({
+      name: "Test", options: twoOptions(), personalityId: "cute", gameMode: "classic",
+    });
+    expect(useAppStore.getState().roulettes.find((x) => x.id === r.id)!.gameMode).toBe("classic");
+  });
+
+  it("stores best_of_3 mode correctly", () => {
+    const r = useAppStore.getState().createRoulette({
+      name: "Test", options: twoOptions(), personalityId: "cute", gameMode: "best_of_3",
+    });
+    expect(useAppStore.getState().roulettes.find((x) => x.id === r.id)!.gameMode).toBe("best_of_3");
+  });
+
+  it("stores veto mode correctly", () => {
+    const r = useAppStore.getState().createRoulette({
+      name: "Test", options: twoOptions(), personalityId: "cute", gameMode: "veto",
+    });
+    expect(useAppStore.getState().roulettes.find((x) => x.id === r.id)!.gameMode).toBe("veto");
+  });
+
+  it("stores elimination mode correctly", () => {
+    const r = useAppStore.getState().createRoulette({
+      name: "Test", options: twoOptions(), personalityId: "cute", gameMode: "elimination",
+    });
+    expect(useAppStore.getState().roulettes.find((x) => x.id === r.id)!.gameMode).toBe("elimination");
+  });
+});
+
+describe("update roulette game mode", () => {
+  const twoOptions = (): RouletteOption[] => [
+    baseOption(),
+    { ...baseOption(), id: "o2", label: "B" },
+  ];
+
+  it("can change from classic to best_of_3", () => {
+    const { createRoulette, updateRoulette } = useAppStore.getState();
+    const r = createRoulette({ name: "T", options: twoOptions(), personalityId: "cute", gameMode: "classic" });
+    updateRoulette(r.id, { gameMode: "best_of_3" });
+    expect(useAppStore.getState().roulettes.find((x) => x.id === r.id)!.gameMode).toBe("best_of_3");
+  });
+
+  it("can change from classic to veto", () => {
+    const { createRoulette, updateRoulette } = useAppStore.getState();
+    const r = createRoulette({ name: "T", options: twoOptions(), personalityId: "cute", gameMode: "classic" });
+    updateRoulette(r.id, { gameMode: "veto" });
+    expect(useAppStore.getState().roulettes.find((x) => x.id === r.id)!.gameMode).toBe("veto");
+  });
+
+  it("can change from classic to elimination", () => {
+    const { createRoulette, updateRoulette } = useAppStore.getState();
+    const r = createRoulette({ name: "T", options: twoOptions(), personalityId: "cute", gameMode: "classic" });
+    updateRoulette(r.id, { gameMode: "elimination" });
+    expect(useAppStore.getState().roulettes.find((x) => x.id === r.id)!.gameMode).toBe("elimination");
+  });
+
+  it("can revert any mode back to classic", () => {
+    const { createRoulette, updateRoulette } = useAppStore.getState();
+    const r = createRoulette({ name: "T", options: twoOptions(), personalityId: "cute", gameMode: "elimination" });
+    updateRoulette(r.id, { gameMode: "classic" });
+    expect(useAppStore.getState().roulettes.find((x) => x.id === r.id)!.gameMode).toBe("classic");
+  });
+});
+
 // ─── all 10 templates build valid roulette drafts ─────────────────────────────
 
 describe("all templates produce valid drafts", () => {

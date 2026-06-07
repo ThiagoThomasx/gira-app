@@ -1,26 +1,44 @@
 import { motion } from "framer-motion";
-import { CheckCircle, RefreshCw, Sparkles } from "lucide-react";
+import { CheckCircle, RefreshCw, Sparkles, ChevronRight } from "lucide-react";
 import type { SpinResult } from "../../types";
 
 interface SpinResultCardProps {
   result: SpinResult;
   onAccept: () => void;
-  onSpinAgain: () => void;
+  /** When provided, shows a "Girar de novo" / secondary action button. */
+  onSpinAgain?: () => void;
   /**
    * "overlay" (default) — slides up from the bottom, covers the wheel.
-   * Used on mobile.
-   *
-   * "inline" — normal block element that slides in from the right.
-   * Used on desktop, rendered inside the info panel column.
+   * "inline" — normal block with x-slide, rendered inside a panel column.
    */
   variant?: "overlay" | "inline";
+  /** Overrides the header label. Default: "O destino escolheu" */
+  title?: string;
+  /** Short label shown above the title (e.g. "Rodada 2 de 3"). */
+  roundLabel?: string;
+  /** Overrides the primary button text. Default: "Aceitar" */
+  acceptLabel?: string;
+  /** When true, adds a winner/final flourish to the card. */
+  isFinalResult?: boolean;
+  /** Secondary action label. Default: "Girar de novo". */
+  spinAgainLabel?: string;
 }
 
 export function SpinResultCard({
-  result, onAccept, onSpinAgain, variant = "overlay",
+  result,
+  onAccept,
+  onSpinAgain,
+  variant = "overlay",
+  title,
+  roundLabel,
+  acceptLabel = "Aceitar",
+  isFinalResult = false,
+  spinAgainLabel = "Girar de novo",
 }: SpinResultCardProps) {
   const color = result.selectedOption.color ?? "#E07B54";
   const isOverlay = variant === "overlay";
+
+  const headerLabel = title ?? (isFinalResult ? "Vencedor escolhido" : "O destino escolheu");
 
   return (
     <motion.div
@@ -48,11 +66,24 @@ export function SpinResultCard({
       />
 
       <div className={isOverlay ? "px-6 pt-5 pb-8" : "px-5 pt-4 pb-5"}>
+        {/* Round label */}
+        {roundLabel && (
+          <motion.p
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            className="text-[10px] font-bold uppercase tracking-widest text-[#A89880] mb-1"
+          >
+            {roundLabel}
+          </motion.p>
+        )}
+
         {/* Header */}
         <div className="flex items-center gap-1.5 mb-4">
-          <Sparkles size={14} className="text-[#F4C430]" />
+          {isFinalResult
+            ? <span className="text-sm">🏆</span>
+            : <Sparkles size={14} className="text-[#F4C430]" />
+          }
           <p className="text-xs font-semibold uppercase tracking-wider text-[#A89880]">
-            O destino escolheu
+            {headerLabel}
           </p>
         </div>
 
@@ -67,7 +98,7 @@ export function SpinResultCard({
             className="w-12 h-12 rounded-xl shrink-0 flex items-center justify-center text-2xl"
             style={{ background: `${color}20`, border: `2.5px solid ${color}` }}
           >
-            🎲
+            {isFinalResult ? "🏆" : "🎲"}
           </div>
           <div className="min-w-0">
             <p className="text-xl font-black leading-tight break-words" style={{ color: "#1C1917" }}>
@@ -101,26 +132,32 @@ export function SpinResultCard({
             onClick={onAccept}
             className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-white text-sm cursor-pointer"
             style={{
-              background: `linear-gradient(135deg, ${color}, ${color}cc)`,
-              boxShadow: `0 4px 16px ${color}44`,
+              background: isFinalResult
+                ? `linear-gradient(135deg, #84A98C, #6B8F72)`
+                : `linear-gradient(135deg, ${color}, ${color}cc)`,
+              boxShadow: isFinalResult
+                ? "0 4px 16px rgba(132,169,140,0.40)"
+                : `0 4px 16px ${color}44`,
             }}
           >
-            <CheckCircle size={16} />
-            Aceitar
+            {isFinalResult ? <CheckCircle size={16} /> : <ChevronRight size={16} />}
+            {acceptLabel}
           </motion.button>
 
-          <motion.button
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.48 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={onSpinAgain}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-[#1C1917] text-sm cursor-pointer"
-            style={{ background: "#F3EDE4", border: "1.5px solid #E7DCCF" }}
-          >
-            <RefreshCw size={16} />
-            Girar de novo
-          </motion.button>
+          {onSpinAgain && (
+            <motion.button
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.48 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={onSpinAgain}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-[#1C1917] text-sm cursor-pointer"
+              style={{ background: "#F3EDE4", border: "1.5px solid #E7DCCF" }}
+            >
+              <RefreshCw size={16} />
+              {spinAgainLabel}
+            </motion.button>
+          )}
         </div>
       </div>
     </motion.div>

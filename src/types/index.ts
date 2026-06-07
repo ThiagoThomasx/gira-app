@@ -89,6 +89,27 @@ export interface Personality {
   };
 }
 
+// ─── Game mode sessions ───────────────────────────────────────────────────────
+
+export interface BestOfThreeRound {
+  roundNumber: number;
+  selectedOption: RouletteOption;
+}
+
+export interface BestOfThreeSession {
+  rounds: BestOfThreeRound[];
+  isComplete: boolean;
+  winner: RouletteOption | null;
+}
+
+export interface EliminationSession {
+  eliminatedIds: string[];
+  winner: RouletteOption | null;
+  isComplete: boolean;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export interface AppPreferences {
   defaultPersonality: PersonalityId;
   hasCompletedOnboarding: boolean;
