@@ -17,6 +17,7 @@ Executar em **mobile (375px)** e **desktop (1280px)**.
 ## 2. Criar roleta
 
 - [ ] Botão "Nova" / "Criar minha primeira roleta" abre EditorPage
+- [ ] Seção "Zona de perigo" **não** aparece ao criar nova roleta (apenas ao editar)
 - [ ] Campo nome exibe placeholder "Ex: O que comer hoje? 🍕"
 - [ ] Campo descrição exibe placeholder correto
 - [ ] Salvar sem nome exibe erro "Nome da roleta é obrigatório."
@@ -114,12 +115,24 @@ Executar em **mobile (375px)** e **desktop (1280px)**.
 
 ## 11. Explorar
 
-- [ ] Todos os templates aparecem em grid
+- [ ] Todos os 11 templates aparecem em grid (incluindo "Casal à Distância")
 - [ ] Busca filtra por nome e descrição
 - [ ] Campo busca tem botão X para limpar
+- [ ] Buscar "distância" ou "chamada" encontra o template "Casal à Distância"
 - [ ] Estado vazio com busca sem resultado exibe link "veja todos"
 - [ ] Botão "Usar" abre EditorPage com o template preenchido
 - [ ] Badge de modo aparece nos templates com modo ≠ Clássico
+
+---
+
+## 11a. Template "Casal à Distância"
+
+- [ ] Template aparece na aba Explorar na categoria Casal
+- [ ] Abre no editor com 12 opções pré-preenchidas
+- [ ] Personalidade padrão: Conselheira 🧘
+- [ ] Modo de jogo padrão: Melhor de 3 🏆
+- [ ] Salvar e girar funciona normalmente
+- [ ] Modo Melhor de 3 completa 3 rodadas e declara vencedor
 
 ---
 
@@ -152,23 +165,49 @@ Executar em **mobile (375px)** e **desktop (1280px)**.
 
 ---
 
-## 15. Edge cases
+## 15. Exclusão segura de roletas
+
+- [ ] Botão "Excluir roleta" aparece no final do Editor (apenas em modo edição)
+- [ ] Primeiro clique mostra confirmação com animação
+- [ ] Botão "Cancelar" volta ao estado inicial sem efeito colateral
+- [ ] "Excluir definitivamente" remove a roleta e navega para Home
+- [ ] Roleta excluída some imediatamente da lista na Home
+- [ ] Estado vazio aparece se era a última roleta
+- [ ] Histórico dos giros anteriores permanece após exclusão
+- [ ] SpinPage não quebra ao navegar após excluir a roleta ativa
+- [ ] Exclusão persiste após recarregar a página (F5)
+
+---
+
+## 16. Edge cases
 
 - [ ] Roleta com 1 opção: roda SVG renderiza círculo completo (sem crash)
 - [ ] Roleta com muitas opções (10+): roda ainda renderiza
 - [ ] Nome de opção muito longo: trunca com "..." nos chips/cards
 - [ ] Sem roletas: SpinPage exibe estado vazio com CTA para criar
-- [ ] Deletar roleta que estava ativa: SpinPage deve degradar graciosamente
+- [ ] Deletar roleta que estava ativa: SpinPage usa próxima disponível sem quebrar
 
 ---
 
-## 16. Performance e build
+## 17. Deploy na Vercel
 
-- [ ] `npm run build` completa sem erros
-- [ ] `npm run test` — todos os testes passam (179+)
+- [ ] App abre normalmente em `gira-app.vercel.app`
+- [ ] LocalStorage funciona no domínio de produção
+- [ ] Sem erros de console em produção
+- [ ] Performance aceitável em rede 4G (celular)
+- [ ] Animações funcionam no Safari mobile (iOS)
+- [ ] Funciona no Chrome Android
+
+---
+
+## 18. Performance e build
+
+- [ ] `npm run build` completa sem erros TypeScript
+- [ ] `npm run test` — todos os testes passam (199+)
+- [ ] Bundle JS < 500kB gzip
 - [ ] Nenhum erro ou warning de console na navegação normal
 - [ ] Animações suaves (sem jank) em mobile
 
 ---
 
-*Atualizado: Bloco 7 — Polimento V1*
+*Atualizado: Bloco 8 — Preparação para teste externo*
