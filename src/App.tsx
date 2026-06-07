@@ -74,6 +74,7 @@ function App() {
         templateId={view.templateId}
         onSaved={(id) => openSpinFor(id)}
         onCancel={() => setView({ screen: "tabs", tab: "home" })}
+        onDeleted={() => setView({ screen: "tabs", tab: "home" })}
       />
     );
   }

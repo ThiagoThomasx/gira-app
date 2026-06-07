@@ -56,9 +56,15 @@ export const useAppStore = create<AppStore>()(
       },
 
       deleteRoulette: (id) => {
-        set((state) => ({
-          roulettes: state.roulettes.filter((r) => r.id !== id),
-        }));
+        set((state) => {
+          const wasActive = state.preferences.lastActiveRouletteId === id;
+          return {
+            roulettes: state.roulettes.filter((r) => r.id !== id),
+            preferences: wasActive
+              ? { ...state.preferences, lastActiveRouletteId: undefined }
+              : state.preferences,
+          };
+        });
       },
 
       pinRoulette: (id, pinned) => {

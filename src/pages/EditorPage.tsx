@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { ArrowLeft, Save } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Save, Trash2, AlertTriangle } from "lucide-react";
 import { OptionEditor } from "../components/editor/OptionEditor";
 import { PersonalitySelector } from "../components/editor/PersonalitySelector";
 import { GameModeSelector } from "../components/editor/GameModeSelector";
@@ -25,6 +25,8 @@ interface EditorPageProps {
   templateId?: string;
   onSaved: (rouletteId: string) => void;
   onCancel: () => void;
+  /** Called after a roulette is successfully deleted (edit mode only). */
+  onDeleted?: () => void;
 }
 
 // ─── section wrapper ─────────────────────────────────────────────────────────
@@ -58,8 +60,9 @@ export function EditorPage({
   templateId,
   onSaved,
   onCancel,
+  onDeleted,
 }: EditorPageProps) {
-  const { roulettes, createRoulette, updateRoulette } = useAppStore();
+  const { roulettes, createRoulette, updateRoulette, deleteRoulette } = useAppStore();
 
   // ── Form state ────────────────────────────────────────────────────────────
 
@@ -73,6 +76,7 @@ export function EditorPage({
   const [gameMode, setGameMode] = useState<GameMode>("classic");
   const [nameError, setNameError] = useState<string | null>(null);
   const [optionsError, setOptionsError] = useState<string | null>(null);
+  const [deleteStep, setDeleteStep] = useState<"idle" | "confirm">("idle");
 
   const nameInputRef = useRef<HTMLInputElement>(null);
 
@@ -159,6 +163,14 @@ export function EditorPage({
       });
       onSaved(created.id);
     }
+  }
+
+  // ── Delete handler ────────────────────────────────────────────────────────
+
+  function handleDelete() {
+    if (!rouletteId) return;
+    deleteRoulette(rouletteId);
+    onDeleted?.();
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -260,6 +272,87 @@ export function EditorPage({
         <Section title="Modo de jogo" hint="Define como as rodadas funcionam.">
           <GameModeSelector value={gameMode} onChange={setGameMode} />
         </Section>
+
+        {/* ── Danger zone (edit mode only) ─────────────────────────────── */}
+        {isEditMode && (
+          <div className="mt-8 pt-6 border-t border-[#F3EDE4]">
+            <div className="flex items-center gap-1.5 mb-3 px-1">
+              <AlertTriangle size={12} className="text-[#EF4444]" />
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#EF4444]">
+                Zona de perigo
+              </p>
+            </div>
+
+            <div
+              className="rounded-2xl border p-4"
+              style={{ borderColor: "rgba(239,68,68,0.20)", background: "rgba(239,68,68,0.03)" }}
+            >
+              <p className="text-sm text-[#6B5E52] mb-4 leading-relaxed">
+                Excluir esta roleta remove suas opções e configurações.{" "}
+                <span className="font-semibold text-[#1C1917]">
+                  O histórico dos giros anteriores será mantido.
+                </span>
+              </p>
+
+              <AnimatePresence mode="wait">
+                {deleteStep === "idle" ? (
+                  <motion.button
+                    key="delete-btn"
+                    type="button"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => setDeleteStep("confirm")}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-all cursor-pointer"
+                    style={{
+                      borderColor: "rgba(239,68,68,0.30)",
+                      color: "#EF4444",
+                      background: "white",
+                    }}
+                  >
+                    <Trash2 size={14} />
+                    Excluir roleta
+                  </motion.button>
+                ) : (
+                  <motion.div
+                    key="delete-confirm"
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="flex flex-col gap-3"
+                  >
+                    <p className="text-sm font-semibold text-[#EF4444]">
+                      Tem certeza? Essa ação não pode ser desfeita.
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <motion.button
+                        type="button"
+                        whileTap={{ scale: 0.96 }}
+                        onClick={() => setDeleteStep("idle")}
+                        className="flex-1 py-2.5 rounded-xl border border-[#E7DCCF] bg-white text-sm font-semibold text-[#6B5E52] cursor-pointer"
+                      >
+                        Cancelar
+                      </motion.button>
+                      <motion.button
+                        type="button"
+                        whileTap={{ scale: 0.96 }}
+                        onClick={handleDelete}
+                        className="flex-1 py-2.5 rounded-xl text-white text-sm font-bold cursor-pointer"
+                        style={{
+                          background: "linear-gradient(135deg, #EF4444, #DC2626)",
+                          boxShadow: "0 4px 12px rgba(239,68,68,0.35)",
+                        }}
+                      >
+                        Excluir definitivamente
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
