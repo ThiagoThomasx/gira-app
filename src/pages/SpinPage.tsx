@@ -11,6 +11,7 @@ import { EliminationPanel } from "../components/roulette/EliminationPanel";
 import { Badge } from "../components/ui/Badge";
 import { useAppStore } from "../store/useAppStore";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { useSound } from "../hooks/useSound";
 import { hasCompletedDailyDestiny } from "../utils/date";
 import {
   toggleVetoOption,
@@ -89,6 +90,9 @@ export function SpinPage({ rouletteId, isDailyDestiny, onCreateNew }: SpinPagePr
   const [elimSession, setElimSession] = useState<EliminationSession | null>(null);
 
   const spinTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tickCleanupRef = useRef<(() => void) | null>(null);
+
+  const { scheduleTicks, playResult } = useSound();
 
   // ── Resolve active roulette on mount ─────────────────────────────────────
 
@@ -144,6 +148,7 @@ export function SpinPage({ rouletteId, isDailyDestiny, onCreateNew }: SpinPagePr
   // Cleanup on unmount
   useEffect(() => () => {
     if (spinTimerRef.current) clearTimeout(spinTimerRef.current);
+    if (tickCleanupRef.current) tickCleanupRef.current();
   }, []);
 
   // ── Derived values ────────────────────────────────────────────────────────
@@ -198,7 +203,13 @@ export function SpinPage({ rouletteId, isDailyDestiny, onCreateNew }: SpinPagePr
     setSpinPhase("spinning");
     setRotation(finalRotation);
 
+    // Schedule tick sounds for the spin duration
+    if (tickCleanupRef.current) tickCleanupRef.current();
+    tickCleanupRef.current = scheduleTicks(SPIN_DURATION_MS);
+
     spinTimerRef.current = setTimeout(() => {
+      // Result ding — plays once when result is revealed
+      playResult();
       if (mode === "classic" || mode === "veto") {
         const result = createSpinResult(activeRoulette, picked, after);
         setCurrentResult(result);

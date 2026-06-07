@@ -31,6 +31,7 @@ export const useAppStore = create<AppStore>()(
       preferences: {
         defaultPersonality: "cute",
         hasCompletedOnboarding: false,
+        soundEnabled: true,
       },
 
       // ── Roletas ────────────────────────────────────────────────────────

@@ -115,6 +115,8 @@ export interface AppPreferences {
   hasCompletedOnboarding: boolean;
   /** ID da última roleta ativa na SpinPage — usado para restaurar após F5. */
   lastActiveRouletteId?: string;
+  /** Se false, todos os sons da roleta são silenciados. Padrão: true. */
+  soundEnabled?: boolean;
 }
 
 export interface AppState {

@@ -112,6 +112,55 @@ export function SettingsPage() {
           </div>
         </div>
 
+        {/* ── Preferências ──────────────────────────────────────────────────── */}
+        <div>
+          <div className="mb-2 px-1">
+            <p className="text-xs font-semibold text-[#A89880] uppercase tracking-wider">
+              Preferências
+            </p>
+          </div>
+          <div
+            className="rounded-2xl border p-4"
+            style={{ borderColor: "#E7DCCF", background: "white" }}
+          >
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-[#1C1917]">Sons da roleta</p>
+                <p className="text-xs text-[#A89880] mt-0.5">
+                  Tiques e ding ao girar.
+                </p>
+              </div>
+              {/* Toggle switch */}
+              <button
+                type="button"
+                role="switch"
+                aria-checked={preferences.soundEnabled ?? true}
+                onClick={() =>
+                  updatePreferences({ soundEnabled: !(preferences.soundEnabled ?? true) })
+                }
+                className="relative shrink-0 w-11 h-6 rounded-full transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E07B54] focus-visible:ring-offset-2"
+                style={{
+                  background:
+                    (preferences.soundEnabled ?? true) ? "#E07B54" : "#D4C9BC",
+                }}
+              >
+                <span
+                  className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200"
+                  style={{
+                    transform:
+                      (preferences.soundEnabled ?? true)
+                        ? "translateX(20px)"
+                        : "translateX(0)",
+                  }}
+                />
+                <span className="sr-only">
+                  {(preferences.soundEnabled ?? true) ? "Desativar sons" : "Ativar sons"}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* ── Danger zone ───────────────────────────────────────────────────── */}
         <div>
           <div className="mb-2 px-1 flex items-center gap-1.5">
