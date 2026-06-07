@@ -6,18 +6,22 @@ import { SpinPage } from "./pages/SpinPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { EditorPage } from "./pages/EditorPage";
+import { useAppStore } from "./store/useAppStore";
+import { hasCompletedDailyDestiny } from "./utils/date";
 import type { Tab } from "./components/layout/BottomNavigation";
 
 // ─── navigation types ─────────────────────────────────────────────────────────
 
 type AppView =
-  | { screen: "tabs"; tab: Tab; selectedRouletteId?: string }
+  | { screen: "tabs"; tab: Tab; selectedRouletteId?: string; isDailyDestiny?: boolean }
   | { screen: "editor"; rouletteId?: string; templateId?: string };
 
 // ─── App ─────────────────────────────────────────────────────────────────────
 
 function App() {
   const [view, setView] = useState<AppView>({ screen: "tabs", tab: "home" });
+
+  const { roulettes, startDailyDestiny, dailyDestiny } = useAppStore();
 
   // ── Navigation helpers ──────────────────────────────────────────────────
 
@@ -33,6 +37,34 @@ function App() {
     setView({ screen: "tabs", tab: "spin", selectedRouletteId: rouletteId });
   }
 
+  function openDailyDestiny() {
+    // Se já concluído hoje, navega de volta à roleta usada (com badge informativo)
+    if (hasCompletedDailyDestiny(dailyDestiny) && dailyDestiny?.rouletteId) {
+      setView({
+        screen: "tabs",
+        tab: "spin",
+        selectedRouletteId: dailyDestiny.rouletteId,
+        isDailyDestiny: true,
+      });
+      return;
+    }
+
+    // Escolhe uma roleta aleatória entre as existentes
+    let rouletteId: string | undefined;
+    if (roulettes.length > 0) {
+      const idx = Math.floor(Math.random() * roulettes.length);
+      rouletteId = roulettes[idx].id;
+    }
+
+    startDailyDestiny(rouletteId);
+    setView({
+      screen: "tabs",
+      tab: "spin",
+      selectedRouletteId: rouletteId,
+      isDailyDestiny: true,
+    });
+  }
+
   // ── Editor screen (full-screen, no bottom nav) ──────────────────────────
 
   if (view.screen === "editor") {
@@ -41,16 +73,14 @@ function App() {
         rouletteId={view.rouletteId}
         templateId={view.templateId}
         onSaved={(id) => openSpinFor(id)}
-        onCancel={() =>
-          setView({ screen: "tabs", tab: view.rouletteId ? "home" : "home" })
-        }
+        onCancel={() => setView({ screen: "tabs", tab: "home" })}
       />
     );
   }
 
   // ── Tab layout ──────────────────────────────────────────────────────────
 
-  const { tab, selectedRouletteId } = view;
+  const { tab, selectedRouletteId, isDailyDestiny } = view;
 
   function renderTab() {
     switch (tab) {
@@ -61,6 +91,7 @@ function App() {
             onOpenRoulette={(id) => openSpinFor(id)}
             onEditRoulette={(id) => openEditor({ rouletteId: id })}
             onUseTemplate={(tmplId) => openEditor({ templateId: tmplId })}
+            onDailyDestiny={openDailyDestiny}
           />
         );
       case "explore":
@@ -70,7 +101,13 @@ function App() {
           />
         );
       case "spin":
-        return <SpinPage rouletteId={selectedRouletteId} />;
+        return (
+          <SpinPage
+            rouletteId={selectedRouletteId}
+            isDailyDestiny={isDailyDestiny}
+            onCreateNew={() => openEditor()}
+          />
+        );
       case "history":
         return <HistoryPage />;
       case "settings":

@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
-import { Plus, Sparkles, Pin, ChevronRight, Zap, Pencil } from "lucide-react";
+import { Plus, Sparkles, Pin, ChevronRight, Zap, Pencil, CheckCircle2 } from "lucide-react";
 import { Card } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
 import { EmptyState } from "../components/ui/EmptyState";
 import { PageHeader } from "../components/layout/PageHeader";
 import { useAppStore } from "../store/useAppStore";
+import { hasCompletedDailyDestiny } from "../utils/date";
 import { personalities } from "../data/personalities";
 import { templates } from "../data/templates";
 
@@ -43,6 +44,7 @@ interface HomePageProps {
   onOpenRoulette: (id: string) => void;
   onEditRoulette: (id: string) => void;
   onUseTemplate: (templateId: string) => void;
+  onDailyDestiny: () => void;
 }
 
 // ─── component ───────────────────────────────────────────────────────────────
@@ -52,8 +54,10 @@ export function HomePage({
   onOpenRoulette,
   onEditRoulette,
   onUseTemplate,
+  onDailyDestiny,
 }: HomePageProps) {
-  const { roulettes, history } = useAppStore();
+  const { roulettes, history, dailyDestiny } = useAppStore();
+  const dailyCompleted = hasCompletedDailyDestiny(dailyDestiny);
 
   const pinned = roulettes.filter((r) => r.isPinned);
   const recent = roulettes.slice(0, 6);
@@ -75,29 +79,68 @@ export function HomePage({
 
   const dailyDestinyBanner = (
     <motion.div variants={itemVariants}>
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#E07B54] to-[#C96A43] p-4 mb-5 shadow-md">
-        <div className="absolute -top-4 -right-4 w-24 h-24 rounded-full bg-white/10" />
-        <div className="absolute -bottom-6 -left-2 w-16 h-16 rounded-full bg-white/10" />
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles size={16} className="text-[#F4C430]" />
-            <span className="text-white/90 text-xs font-semibold uppercase tracking-wider">
-              Destino do dia
+      {dailyCompleted ? (
+        /* ── Concluído ── */
+        <motion.button
+          type="button"
+          whileTap={{ scale: 0.98 }}
+          onClick={onDailyDestiny}
+          className="w-full text-left relative overflow-hidden rounded-2xl p-4 mb-5 cursor-pointer"
+          style={{
+            background: "linear-gradient(135deg, #84A98C, #6B8F72)",
+            boxShadow: "0 4px 20px rgba(107,143,114,0.30)",
+          }}
+        >
+          <div className="absolute -top-4 -right-4 w-24 h-24 rounded-full bg-white/10" />
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle2 size={16} className="text-white/90" />
+              <span className="text-white/90 text-xs font-semibold uppercase tracking-wider">
+                Destino do dia
+              </span>
+            </div>
+            <p className="text-white font-bold text-lg leading-snug mb-1">
+              Destino de hoje decidido ✓
+            </p>
+            <p className="text-white/75 text-xs">
+              Toque para ver a roleta usada
+            </p>
+          </div>
+        </motion.button>
+      ) : (
+        /* ── Disponível ── */
+        <motion.button
+          type="button"
+          whileTap={{ scale: 0.98 }}
+          onClick={onDailyDestiny}
+          className="w-full text-left relative overflow-hidden rounded-2xl p-4 mb-5 cursor-pointer"
+          style={{
+            background: "linear-gradient(135deg, #E07B54, #C96A43)",
+            boxShadow: "0 4px 20px rgba(224,123,84,0.35)",
+          }}
+        >
+          <div className="absolute -top-4 -right-4 w-24 h-24 rounded-full bg-white/10" />
+          <div className="absolute -bottom-6 -left-2 w-16 h-16 rounded-full bg-white/10" />
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles size={16} className="text-[#F4C430]" />
+              <span className="text-white/90 text-xs font-semibold uppercase tracking-wider">
+                Destino do dia
+              </span>
+            </div>
+            <p className="text-white font-bold text-lg leading-snug mb-3">
+              O que o universo tem pra você hoje?
+            </p>
+            <span
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white text-sm font-semibold"
+              style={{ background: "rgba(255,255,255,0.22)", border: "1px solid rgba(255,255,255,0.35)" }}
+            >
+              <Zap size={14} />
+              Descobrir agora
             </span>
           </div>
-          <p className="text-white font-bold text-lg leading-snug mb-3">
-            O que o universo tem pra você hoje?
-          </p>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="bg-white/20 text-white border-white/30 hover:bg-white/30"
-          >
-            <Zap size={14} />
-            Descobrir agora
-          </Button>
-        </div>
-      </div>
+        </motion.button>
+      )}
     </motion.div>
   );
 

@@ -92,6 +92,8 @@ export interface Personality {
 export interface AppPreferences {
   defaultPersonality: PersonalityId;
   hasCompletedOnboarding: boolean;
+  /** ID da última roleta ativa na SpinPage — usado para restaurar após F5. */
+  lastActiveRouletteId?: string;
 }
 
 export interface AppState {
