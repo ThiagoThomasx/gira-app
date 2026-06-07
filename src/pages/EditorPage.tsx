@@ -181,7 +181,7 @@ export function EditorPage({
           <h1 className="text-lg font-black text-[#1C1917] leading-tight">
             {title}
           </h1>
-          <p className="text-xs text-[#A89880]">Monte sua indecisão personalizada.</p>
+          <p className="text-xs text-[#A89880]">Configure e salve sua roleta.</p>
         </div>
 
         <motion.button
@@ -212,7 +212,7 @@ export function EditorPage({
               setName(e.target.value);
               if (nameError) setNameError(null);
             }}
-            placeholder="Ex: O que comer hoje?"
+            placeholder="Ex: O que comer hoje? 🍕"
             maxLength={80}
             className="w-full bg-white border rounded-xl px-4 py-3 text-base font-semibold text-[#1C1917] placeholder-[#C0B4A8] outline-none transition-all"
             style={{
@@ -232,7 +232,7 @@ export function EditorPage({
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Para que serve essa roleta?"
+            placeholder="Ex: Usada quando o grupo não consegue decidir o jantar."
             maxLength={200}
             rows={2}
             className="w-full bg-white border border-[#E7DCCF] rounded-xl px-4 py-3 text-sm text-[#1C1917] placeholder-[#C0B4A8] outline-none resize-none focus:border-[#E07B54] focus:ring-2 focus:ring-[#E07B54]/15 transition-all"
@@ -240,7 +240,7 @@ export function EditorPage({
         </Section>
 
         {/* Options */}
-        <Section title="Opções do destino" hint="Mínimo 2. Arraste os pesos para favorecer uma opção.">
+        <Section title="Opções do destino" hint="Mínimo 2. Ajuste o peso para que uma opção apareça com mais frequência.">
           <OptionEditor
             options={options}
             onChange={(updated) => {
@@ -257,7 +257,7 @@ export function EditorPage({
         </Section>
 
         {/* Game mode */}
-        <Section title="Modo de jogo">
+        <Section title="Modo de jogo" hint="Define como as rodadas funcionam.">
           <GameModeSelector value={gameMode} onChange={setGameMode} />
         </Section>
 

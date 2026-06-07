@@ -109,7 +109,7 @@ function App() {
           />
         );
       case "history":
-        return <HistoryPage />;
+        return <HistoryPage onGoSpin={() => goToTab("spin")} />;
       case "settings":
         return <SettingsPage />;
     }
